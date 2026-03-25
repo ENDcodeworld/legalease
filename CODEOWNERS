@@ -1,0 +1,23 @@
+# 项目维护者
+* @yourusername
+
+# 代码审查者
+/app/api/ @yourusername
+/app/components/ @yourusername
+/app/chat/ @yourusername
+
+# 文档
+*.md @yourusername
+/docs/ @yourusername
+
+# 数据文件
+/data/ @yourusername
+
+# 脚本
+/scripts/ @yourusername
+
+# 配置文件
+docker-compose.yml @yourusername
+Dockerfile @yourusername
+next.config.js @yourusername
+tailwind.config.js @yourusername

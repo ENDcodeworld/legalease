@@ -1,0 +1,26 @@
+# GitHub Codespaces 配置
+# 让开发者一键开箱即用
+
+{
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "CONTRIBUTING.md",
+        "app/page.tsx"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  },
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [3000, 8000],
+  "postCreateCommand": "npm install && cp .env.example .env.local",
+  "postStartCommand": "npm run dev",
+  "remoteUser": "vscode"
+}

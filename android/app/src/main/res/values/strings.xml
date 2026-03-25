@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LegalEase</string>
+    <string name="title_activity_main">LegalEase</string>
+    
+    <!-- Splash Screen -->
+    <string name="splashscreen_logo_description">LegalEase Logo</string>
+    <string name="splashscreen_title_description">LegalEase - 法律援助智能助手</string>
+    
+    <!-- Errors -->
+    <string name="camera_usage_description">需要相机权限来扫描文档</string>
+    <string name="storage_usage_description">需要存储权限来保存文件</string>
+    
+    <!-- Notifications -->
+    <string name="notification_channel_name">LegalEase 通知</string>
+    <string name="notification_channel_description">法律援助助手的重要通知</string>
+</resources>

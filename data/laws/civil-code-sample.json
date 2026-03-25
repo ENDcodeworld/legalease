@@ -1,0 +1,47 @@
+{
+  "id": "law_001",
+  "title": "中华人民共和国民法典",
+  "category": "民事",
+  "pub_date": "2021-01-01",
+  "effective_date": "2021-01-01",
+  "source": "全国人民代表大会",
+  "source_url": "http://www.npc.gov.cn/npc/c30834/202012/9f0a3e3e3e3e4e3e3e3e3e3e3e3e3e3.shtml",
+  "chapters": [
+    {
+      "id": "chapter_1",
+      "title": "第一编 总则",
+      "articles": [
+        {
+          "id": "article_1",
+          "number": "第一条",
+          "title": "立法目的",
+          "content": "为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，适应中国特色社会主义发展要求，弘扬社会主义核心价值观，根据宪法，制定本法。"
+        },
+        {
+          "id": "article_2",
+          "number": "第二条",
+          "title": "民事权益",
+          "content": "民法调整平等主体的自然人、法人和非法人组织之间的人身关系和财产关系。"
+        },
+        {
+          "id": "article_3",
+          "number": "第三条",
+          "title": "民事权益受法律保护",
+          "content": "民事主体的民事权利受法律保护，任何组织或者个人不得侵犯。"
+        }
+      ]
+    },
+    {
+      "id": "chapter_2",
+      "title": "第二编 物权",
+      "articles": [
+        {
+          "id": "article_205",
+          "number": "第二百零五条",
+          "title": "不动产登记",
+          "content": "本编调整因物的归属和利用产生的民事关系。"
+        }
+      ]
+    }
+  ]
+}
