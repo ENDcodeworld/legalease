@@ -4,7 +4,7 @@
 
 ### Android APK（推荐）
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 ./scripts/build-apk.sh debug
 # 安装 legalease-debug.apk 到手机
@@ -125,4 +125,4 @@ npm run android:build    # 发布版
 
 如果觉得项目有用，请 Star 支持！⭐
 
-[GitHub](https://github.com/yourusername/legalease) | [Discord](https://discord.gg/your-invite)
+[GitHub](https://github.com/ENDcodeworld/legalease) | [Discord](https://discord.gg/your-invite)

@@ -1,14 +1,13 @@
 # LegalEase - 法律援助智能助手
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/legalease?style=social)](https://github.com/yourusername/legalease)
+[![GitHub stars](https://img.shields.io/github/stars/ENDcodeworld/legalease?style=social)](https://github.com/ENDcodeworld/legalease)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ENDcodeworld/legalease)](https://github.com/ENDcodeworld/legalease/commits/main)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Contributors](https://img.shields.io/github/contributors/ENDcodeworld/legalease.svg)](https://github.com/ENDcodeworld/legalease/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/ENDcodeworld/legalease.svg)](https://github.com/ENDcodeworld/legalease/network)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-7289DA)](https://discord.gg/your-invite)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/legalease/ci.yml?branch=main)](https://github.com/yourusername/legalease/actions)
-[![codecov](https://codecov.io/gh/yourusername/legalease/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/legalease)
-[![Contributors](https://img.shields.io/github/contributors/yourusername/legalease.svg)](https://github.com/yourusername/legalease/graphs/contributors)
-[![Forks](https://img.shields.io/github/forks/yourusername/legalease.svg)](https://github.com/yourusername/legalease/network)
-[![Issues](https://img.shields.io/github/issues/yourusername/legalease.svg)](https://github.com/yourusername/legalease/issues)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Launched-orange.svg)](https://www.producthunt.com/posts/legalease)
 
 > 🎯 **使命**：让每个人都能轻松获得法律援助，降低法律咨询门槛  
 > 🚀 **目标**：下个月突破 **1000 GitHub Stars**  
@@ -41,7 +40,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 
 # 2. 一键生成 APK
@@ -58,17 +57,17 @@ cd legalease
 ```bash
 docker run -p 3000:3000 \
   -e OPENAI_API_KEY=your_key \
-  ghcr.io/yourusername/legalease:latest
+  ghcr.io/ENDcodeworld/legalease:latest
 ```
 
 ### 方式三：Vercel 一键部署 ⚡
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Flegalease)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/clone?repository-url=https%3A%2F%2Fgithub.com%2FENDcodeworld%2Flegalease)
 
 ### 方式四：本地运行
 
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 npm install
 npm run dev
@@ -177,4 +176,4 @@ legalease/
 
 **目标是下个月达到 1000 star，你确定要加入吗？**
 
-[👉 立即 Star 支持我们](https://github.com/yourusername/legalease/stargazers)
+[👉 立即 Star 支持我们](https://github.com/ENDcodeworld/legalease/stargazers)

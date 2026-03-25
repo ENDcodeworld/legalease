@@ -24,7 +24,7 @@
 1. **克隆项目**
 
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 ```
 
@@ -69,7 +69,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### 一键部署
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Flegalease)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/clone?repository-url=https%3A%2F%2Fgithub.com%2FENDcodeworld%2Flegalease)
 
 点击按钮，按照提示操作即可。
 
@@ -103,7 +103,7 @@ docker-compose -f docker-compose.prod.yml up -d
 1. **克隆并安装**
 
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 npm install
 ```
@@ -177,7 +177,7 @@ mkdir -p /opt/legalease
 cd /opt/legalease
 
 # 拉取代码
-git clone https://github.com/yourusername/legalease.git .
+git clone https://github.com/ENDcodeworld/legalease.git .
 
 # 配置环境
 cp .env.example .env

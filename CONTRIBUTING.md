@@ -25,7 +25,7 @@
 
 ### 报告 Bug
 
-如果发现 Bug，请先在 [Issues](https://github.com/yourusername/legalease/issues) 中搜索是否已存在相同问题。如果没有，请创建新 Issue，并提供：
+如果发现 Bug，请先在 [Issues](https://github.com/ENDcodeworld/legalease/issues) 中搜索是否已存在相同问题。如果没有，请创建新 Issue，并提供：
 
 - **清晰的标题**：简要描述问题
 - **复现步骤**：详细说明如何重现 Bug
@@ -52,7 +52,7 @@
 #### 2. 克隆到本地
 
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 ```
 
@@ -149,7 +149,7 @@ git push origin feature/your-feature-name
 1. **克隆并安装**
 
 ```bash
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 npm install
 ```
@@ -261,7 +261,7 @@ A:
 ## 联系我们
 
 - **Discord**: [加入我们的服务器](https://discord.gg/your-invite)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/legalease/issues)
+- **Issues**: [GitHub Issues](https://github.com/ENDcodeworld/legalease/issues)
 - **邮箱**: contact@legalease.dev（待申请）
 
 ## 致谢

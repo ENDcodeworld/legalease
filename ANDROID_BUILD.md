@@ -4,7 +4,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/yourusername/legalease.git
+git clone https://github.com/ENDcodeworld/legalease.git
 cd legalease
 
 # 2. 一键生成 APK
@@ -336,7 +336,7 @@ server: {
 
 ## 📞 技术支持
 
-- GitHub Issues: https://github.com/yourusername/legalease/issues
+- GitHub Issues: https://github.com/ENDcodeworld/legalease/issues
 - 文档: https://legalease-docs.vercel.app
 - 邮箱: support@legalease.dev
 
