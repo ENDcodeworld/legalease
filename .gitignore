@@ -41,3 +41,25 @@ coverage/
 
 # 类型检查
 *.tsbuildinfo
+
+# Android
+android/.gradle
+android/.cxx
+android/.externalNativeBuild
+android/app/build
+android/local.properties
+android/*.jks
+android/*.keystore
+
+# 下载的数据（可从源重新生成）
+data/laws/*-full.json
+data/cases/cases-enriched.json
+data/standards/
+
+# 发布包
+release/*.tar.gz
+release/*.zip
+
+# 备份文件
+*.bak
+*.backup

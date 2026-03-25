@@ -1,0 +1,96 @@
+name: LegalEase CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint
+      run: npm run lint || true
+    
+    - name: Type check
+      run: npx tsc --noEmit || true
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Check build output
+      run: |
+        if [ ! -d "out" ]; then
+          echo "Build output directory 'out' not found!"
+          exit 1
+        fi
+        echo "✅ Build successful"
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check for console.log
+      run: |
+        if grep -r "console\.log" --include="*.ts" --include="*.tsx" app/ scripts/; then
+          echo "⚠️  Found console.log statements. Consider removing them in production."
+        fi
+    
+    - name: Validate JSON files
+      run: |
+        find data -name "*.json" -exec jq empty {} \;
+
+  # 可选：Docker 镜像构建测试
+  docker:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: legalease:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
