@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChromaClient } from 'chromadb';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { OpenAI } from 'langchain/llms/openai';
+import { Anthropic } from '@anthropic-ai/sdk';
 
 // 初始化 ChromaDB
 const chroma = new ChromaClient({
@@ -10,19 +11,45 @@ const chroma = new ChromaClient({
     : 'http://localhost:8000',
 });
 
+// 获取嵌入模型（统一使用 OpenAI，因为效果最好）
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
-const llm = new OpenAI({
-  openAIApiKey: process.env.OPENAI_API_KEY,
-  temperature: 0.7,
-  modelName: 'gpt-4-turbo-preview',
-});
+// 根据提供商获取 LLM
+async function getLLM(provider: string, apiKey: string, modelName: string, options: any = {}) {
+  switch (provider) {
+    case 'openai':
+      return new OpenAI({
+        openAIApiKey: apiKey,
+        temperature: options.temperature || 0.7,
+        modelName: modelName || 'gpt-4-turbo-preview',
+      });
+    
+    case 'anthropic':
+      return new Anthropic({
+        apiKey: apiKey,
+      }).messages;
+    
+    case 'ollama':
+      // 使用 Ollama 的 OpenAI 兼容接口
+      return new OpenAI({
+        openAIApiKey: 'ollama', // dummy
+        configuration: {
+          baseURL: options.baseUrl || 'http://localhost:11434/v1',
+        },
+        modelName: modelName || 'llama2',
+        temperature: options.temperature || 0.7,
+      });
+    
+    default:
+      throw new Error(`Unsupported provider: ${provider}`);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, settings } = await request.json();
 
     if (!message) {
       return NextResponse.json(
@@ -30,6 +57,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const {
+      provider = 'openai',
+      apiKey = process.env.OPENAI_API_KEY,
+      modelName = 'gpt-4-turbo-preview',
+      ollamaBaseUrl = 'http://localhost:11434',
+    } = settings || {};
 
     // 1. 生成查询向量
     const queryEmbedding = await embeddings.embedQuery(message);
@@ -81,11 +115,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. 构建 Prompt
-    const prompt = `你是一个专业的法律助手，请根据以下参考信息回答用户的问题。
+    const systemPrompt = `你是一个专业的法律助手，请根据以下参考信息回答用户的问题。
 
 ${context}
-
-用户问题：${message}
 
 请提供：
 1. 清晰、准确的法律分析
@@ -96,17 +128,34 @@ ${context}
 回答要用中文，使用 Markdown 格式，条理清晰。`;
 
     // 6. 调用 LLM
-    const answer = await llm.invoke(prompt);
+    let answer: string;
+    
+    if (provider === 'anthropic') {
+      const anthropic = await getLLM(provider, apiKey, modelName);
+      const response = await anthropic.messages.create({
+        model: modelName,
+        max_tokens: 2000,
+        messages: [
+          { role: 'user', content: systemPrompt + '\n\n用户问题：' + message }
+        ],
+      });
+      answer = response.content[0]?.text || '抱歉，我遇到了一些问题。';
+    } else {
+      const llm = await getLLM(provider, apiKey, modelName, { baseUrl: ollamaBaseUrl });
+      answer = await llm.invoke(systemPrompt + '\n\n用户问题：' + message);
+    }
 
     return NextResponse.json({
       answer,
-      sources: sources.slice(0, 3), // 最多返回 3 个来源
+      sources: sources.slice(0, 3),
+      provider,
+      model: modelName,
     });
 
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

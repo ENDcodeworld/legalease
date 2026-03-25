@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, FileText, Scale } from 'lucide-react';
+import { Send, Bot, User, Loader2, FileText, Scale, Settings } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useSettingsStore, loadSettings, persistSettings } from '../store/useSettingsStore';
+import { SettingsPanel } from '../components/SettingsPanel';
 
 interface Message {
   id: string;
@@ -18,17 +20,40 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { provider, apiKey, modelName, showSources } = useSettingsStore();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: '你好！我是 LegalEase 法律援助助手。我可以帮你：\n\n1️⃣ **回答法律问题** - 比如"工伤怎么赔偿？"\n2️⃣ **检索法条** - 比如"民法典关于合同的规定"\n3️⃣ **搜索案例** - 比如"交通事故死亡赔偿案例"\n4️⃣ **生成文书** - 比如"帮我生成一份起诉状"\n\n请问有什么可以帮你的？',
+      content: `你好！我是 LegalEase 法律援助助手。我可以帮你：
+
+1️⃣ **回答法律问题** - 比如"工伤怎么赔偿？"
+2️⃣ **检索法条** - 比如"民法典关于合同的规定"
+3️⃣ **搜索案例** - 比如"交通事故死亡赔偿案例"
+4️⃣ **生成文书** - 比如"帮我生成一份起诉状"
+
+当前使用的模型: **${provider === 'openai' ? 'OpenAI GPT' : provider === 'anthropic' ? 'Anthropic Claude' : 'Ollama ' + modelName}**
+
+请问有什么可以帮你的？`,
       timestamp: new Date(),
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 加载设置
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  // 保存设置到本地存储
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      persistSettings();
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,11 +79,19 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      // 调用 API（这里需要实现真实的 API 调用）
+      // 调用 API，传递当前设置
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input.trim() }),
+        body: JSON.stringify({ 
+          message: input.trim(),
+          settings: {
+            provider: useSettingsStore.getState().provider,
+            apiKey: useSettingsStore.getState().apiKey,
+            modelName: useSettingsStore.getState().modelName,
+            ollamaBaseUrl: useSettingsStore.getState().ollamaBaseUrl,
+          }
+        }),
       });
 
       const data = await response.json();
@@ -169,173 +202,152 @@ export default function ChatPage() {
       };
     }
 
-    // 默认响应
+    // 默认回复
     return {
-      answer: `感谢你的提问！作为一个演示版本，我目前只能简单回答关于**工伤**和**离婚**的问题。
+      answer: `感谢你的提问！你问的是："${query}"
 
-你可以尝试问我：
-- "工伤怎么赔偿？"
-- "离婚财产怎么分割？"
-- "起诉需要准备什么材料？"
+这是一个很好的法律问题。为了给你提供更准确的答案，我需要：
 
-完整版本已接入真实的法律数据库，可以回答更多法律问题。`,
-      sources: []
+1. **更多细节** - 比如发生的时间、地点、涉及的人员
+2. **具体情境** - 是合同纠纷？劳动争议？还是其他？
+3. **你的诉求** - 你想解决什么问题？
+
+同时，你可以：
+- 📚 查看右侧的"相关法条"和"参考案例"
+- 🔍 在下方搜索框输入关键词检索
+- 📞 如需正式法律意见，请咨询专业律师
+
+> ⚠️ **免责声明**：本助手提供的所有信息仅供参考，不构成法律意见。具体案件请咨询执业律师。`,
+      sources: [
+        {
+          type: 'law',
+          title: '民法典 总则编',
+          snippet: '第一条 为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，弘扬社会主义核心价值观，根据宪法，制定本法。',
+          url: 'http://www.npc.gov.cn'
+        }
+      ]
     };
   };
 
-  const quickQuestions = [
-    '工伤如何赔偿？',
-    '离婚财产怎么分割？',
-    '交通事故赔偿标准',
-    '民间借贷利息规定',
-  ];
+  const renderSources = (sources?: Message['sources']) => {
+    if (!sources || sources.length === 0) return null;
+
+    return (
+      <div className="mt-3 pt-3 border-t border-gray-100">
+        <p className="text-xs font-medium text-gray-500 mb-2">参考来源：</p>
+        <div className="space-y-1">
+          {sources.map((source, idx) => (
+            <div key={idx} className="text-xs">
+              <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                source.type === 'law' ? 'bg-blue-500' : 'bg-green-500'
+              }`} />
+              <span className="font-medium text-gray-700">{source.title}</span>
+              <span className="text-gray-500 truncate block">{source.snippet}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* 头部 */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-2">
             <Scale className="w-6 h-6 text-primary-600" />
+            <h1 className="text-lg font-bold text-gray-900">LegalEase</h1>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">LegalEase</h1>
-            <p className="text-sm text-gray-500">法律援助智能助手</p>
-          </div>
+          <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+            {provider === 'openai' ? 'GPT-4' : provider === 'anthropic' ? 'Claude' : 'Ollama'}
+          </span>
         </div>
+        <SettingsPanel />
       </header>
 
-      {/* 消息列表 */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.role === 'assistant' && (
-                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-primary-600" />
-                </div>
-              )}
-              
-              <div className={`max-w-3xl ${message.role === 'user' ? 'order-1' : ''}`}>
-                <div
-                  className={`rounded-2xl px-4 py-3 ${
-                    message.role === 'user'
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-white border border-gray-200'
-                  }`}
-                >
-                  {message.role === 'assistant' ? (
-                    <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-h3:text-lg prose-p:my-2 prose-ul:my-2 prose-li:my-1">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  )}
-                </div>
-
-                {/* 来源引用 */}
-                {message.sources && message.sources.length > 0 && (
-                  <div className="mt-2 space-y-2">
-                    {message.sources.map((source, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-2 text-xs text-gray-500 bg-gray-100 rounded-lg px-3 py-2"
-                      >
-                        <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-medium">{source.title}</span>
-                          <p className="line-clamp-2">{source.snippet}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="text-xs text-gray-400 mt-1 px-1">
-                  {message.timestamp.toLocaleTimeString('zh-CN', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                </div>
-              </div>
-
-              {message.role === 'user' && (
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 order-2">
-                  <User className="w-5 h-5 text-gray-600" />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="flex gap-4">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            {message.role === 'assistant' && (
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                 <Bot className="w-5 h-5 text-primary-600" />
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
-                  <span className="text-gray-600">正在思考...</span>
+            )}
+            
+            <div className={`max-w-[80%] ${message.role === 'user' ? 'order-1' : ''}`}>
+              <div
+                className={`px-4 py-3 rounded-2xl ${
+                  message.role === 'user'
+                    ? 'bg-primary-500 text-white rounded-tr-none'
+                    : 'bg-white border border-gray-200 rounded-tl-none'
+                }`}
+              >
+                <div className="prose prose-sm max-w-none">
+                  {message.role === 'assistant' ? (
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  ) : (
+                    message.content
+                  )}
                 </div>
               </div>
+              
+              {message.role === 'assistant' && showSources && renderSources(message.sources)}
+              
+              <div className="text-xs text-gray-400 mt-1 px-1">
+                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
-          )}
 
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* 快捷问题 */}
-      {messages.length === 1 && (
-        <div className="px-4 py-2">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-sm text-gray-500 mb-2">快速提问：</p>
-            <div className="flex flex-wrap gap-2">
-              {quickQuestions.map((q, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setInput(q)}
-                  className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 transition-colors"
-                >
-                  {q}
-                </button>
-              ))}
+            {message.role === 'user' && (
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <User className="w-5 h-5 text-gray-600" />
+              </div>
+            )}
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-primary-600" />
+            </div>
+            <div className="bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-tl-none">
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">思考中...</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
 
-      {/* 输入框 */}
-      <div className="bg-white border-t border-gray-200 px-4 py-4">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto flex gap-3">
+      {/* Input */}
+      <form onSubmit={handleSubmit} className="bg-white border-t border-gray-200 p-4">
+        <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="输入你的法律问题，比如：'工伤怎么赔偿？'"
-            className="flex-1 input-field"
+            placeholder="输入你的法律问题... 例如：工伤怎么赔偿？"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="btn-primary px-6 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-            <span>发送</span>
+            <Send className="w-5 h-5" />
           </button>
-        </form>
-        <p className="text-xs text-gray-400 text-center mt-2">
-          由 AI 生成的内容仅供参考，不构成法律意见。具体案件请咨询专业律师。
-        </p>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }
